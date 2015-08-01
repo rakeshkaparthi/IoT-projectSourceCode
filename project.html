@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- EXTERNAL LIBS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://www.google.com/jsapi"></script>
+
+    <!-- EXAMPLE SCRIPT -->
+    <script>
+
+      // onload callback
+      function drawChart() {
+
+        var public_key = 'dZ4EVmE8yGCRGx5XRX1W';
+
+        // JSONP request
+        var jsonData = $.ajax({
+          url: 'https://data.sparkfun.com/output/aGOE6rY5mxcxX1GNnOKq.json',
+          data: {page: 1},
+		  dataType: 'jsonp',
+        }).done(function (results) {
+
+          var data = new google.visualization.DataTable();
+
+          data.addColumn('datetime', 'Time');
+          data.addColumn('number', 'Light');
+          data.addColumn('number','Temperature')
+
+          $.each(results, function (i, row) {
+            data.addRow([
+              (new Date(row.timestamp)),
+              parseFloat(row.light),
+              parseFloat(row.temperature)
+            ]);
+          });
+
+          var chart = new google.visualization.LineChart($('#chart').get(0));
+
+          chart.draw(data, {
+            title: 'Raspberry Pi Light and Temperature changes using class stream',
+            curveType: 'function',
+            legend: { position: 'bottom' },
+        vAxis: {
+          title: 'UNITS'
+        },
+        backgroundColor: '#f1f8e9',
+        colors: ['#097138', '#a52714'],
+        crosshair: {
+          color: '#000',
+          trigger: 'selection'
+        },
+         hAxis: { gridlines: { count: 4 } },
+        height: 500,
+          });
+        chart.setSelection([{row:130, column:1}]);
+        });
+
+      }
+
+      // load chart lib
+      google.load('visualization', '1', {
+        packages: ['corechart']
+      });
+
+      // call drawChart once google charts is loaded
+      google.setOnLoadCallback(drawChart);
+
+    </script>
+
+  </head>
+  <body>
+    <div id="chart" style="width: 100%;"></div>
+  </body>
+</html>
